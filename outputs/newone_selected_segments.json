@@ -1,0 +1,32 @@
+{
+  "video": "assets\\newone.mp4",
+  "fps": 56.26347720957388,
+  "frame_count": 1362,
+  "segment_seconds": 4.0,
+  "segments": [
+    {
+      "rank": 1,
+      "start_frame": 5,
+      "end_frame": 230,
+      "start_seconds": 0.08886759667156142,
+      "end_seconds": 4.087909446891826,
+      "average_score": 0.9505934573544401
+    },
+    {
+      "rank": 2,
+      "start_frame": 414,
+      "end_frame": 639,
+      "start_seconds": 7.358237004405287,
+      "end_seconds": 11.357278854625552,
+      "average_score": 0.9768568902103973
+    },
+    {
+      "rank": 3,
+      "start_frame": 1047,
+      "end_frame": 1272,
+      "start_seconds": 18.608874743024963,
+      "end_seconds": 22.60791659324523,
+      "average_score": 0.980269492997065
+    }
+  ]
+}

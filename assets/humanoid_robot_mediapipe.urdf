@@ -1,0 +1,438 @@
+<?xml version="1.0" ?>
+<robot name="humanoid_robot_mediapipe">
+  <!-- 基于 MediaPipe 33 点人体模型的人形机器人 -->
+  <!-- 包括: 头部, 躯干(肩膀-腹部-骨盆), 四肢(手臂和腿) -->
+
+  <!-- 根关节（脚部中心） -->
+  <link name="base_link">
+    <inertial>
+      <origin xyz="0 0 0.05"/>
+      <mass value="2.0"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <box size="0.25 0.35 0.1"/>
+      </geometry>
+      <origin xyz="0 0 0.05"/>
+      <material name="gray">
+        <color rgba="0.5 0.5 0.5 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.25 0.35 0.1"/>
+      </geometry>
+      <origin xyz="0 0 0.05"/>
+    </collision>
+  </link>
+
+  <!-- ======================= 左腿 ======================= -->
+  <!-- 左髋关节 (MediaPipe 25) -->
+  <joint name="left_hip" type="revolute">
+    <parent link="base_link"/>
+    <child link="left_hip_link"/>
+    <origin xyz="-0.1 0 0.15" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-1.57" upper="1.57" effort="150" velocity="2.0"/>
+  </joint>
+
+  <link name="left_hip_link">
+    <inertial>
+      <origin xyz="0 0 -0.2"/>
+      <mass value="1.5"/>
+      <inertia ixx="0.02" ixy="0" ixz="0" iyy="0.02" iyz="0" izz="0.01"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <capsule length="0.4" radius="0.038"/>
+      </geometry>
+      <origin xyz="0 0 -0.2" rpy="0 1.5707 0"/>
+      <material name="blue_leg">
+        <color rgba="0.2 0.5 0.9 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <capsule length="0.4" radius="0.038"/>
+      </geometry>
+      <origin xyz="0 0 -0.2" rpy="0 1.5707 0"/>
+    </collision>
+  </link>
+
+  <!-- 左膝关节 (MediaPipe 27) -->
+  <joint name="left_knee" type="revolute">
+    <parent link="left_hip_link"/>
+    <child link="left_knee_link"/>
+    <origin xyz="0 0 -0.4" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="0" upper="2.2" effort="150" velocity="2.0"/>
+  </joint>
+
+  <link name="left_knee_link">
+    <inertial>
+      <origin xyz="0 0 -0.15"/>
+      <mass value="1.2"/>
+      <inertia ixx="0.015" ixy="0" ixz="0" iyy="0.015" iyz="0" izz="0.005"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <capsule length="0.3" radius="0.035"/>
+      </geometry>
+      <origin xyz="0 0 -0.15" rpy="0 1.5707 0"/>
+      <material name="blue_leg">
+        <color rgba="0.2 0.5 0.9 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <capsule length="0.3" radius="0.035"/>
+      </geometry>
+      <origin xyz="0 0 -0.15" rpy="0 1.5707 0"/>
+    </collision>
+  </link>
+
+  <!-- 右腿 -->
+  <joint name="right_hip" type="revolute">
+    <parent link="base_link"/>
+    <child link="right_hip_link"/>
+    <origin xyz="0.1 0 0.15" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-1.57" upper="1.57" effort="150" velocity="2.0"/>
+  </joint>
+
+  <link name="right_hip_link">
+    <inertial>
+      <origin xyz="0 0 -0.2"/>
+      <mass value="1.5"/>
+      <inertia ixx="0.02" ixy="0" ixz="0" iyy="0.02" iyz="0" izz="0.01"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <capsule length="0.4" radius="0.038"/>
+      </geometry>
+      <origin xyz="0 0 -0.2" rpy="0 1.5707 0"/>
+      <material name="blue_leg">
+        <color rgba="0.2 0.5 0.9 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <capsule length="0.4" radius="0.038"/>
+      </geometry>
+      <origin xyz="0 0 -0.2" rpy="0 1.5707 0"/>
+    </collision>
+  </link>
+
+  <joint name="right_knee" type="revolute">
+    <parent link="right_hip_link"/>
+    <child link="right_knee_link"/>
+    <origin xyz="0 0 -0.4" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="0" upper="2.2" effort="150" velocity="2.0"/>
+  </joint>
+
+  <link name="right_knee_link">
+    <inertial>
+      <origin xyz="0 0 -0.15"/>
+      <mass value="1.2"/>
+      <inertia ixx="0.015" ixy="0" ixz="0" iyy="0.015" iyz="0" izz="0.005"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <capsule length="0.3" radius="0.035"/>
+      </geometry>
+      <origin xyz="0 0 -0.15" rpy="0 1.5707 0"/>
+      <material name="blue_leg">
+        <color rgba="0.2 0.5 0.9 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <capsule length="0.3" radius="0.035"/>
+      </geometry>
+      <origin xyz="0 0 -0.15" rpy="0 1.5707 0"/>
+    </collision>
+  </link>
+
+  <!-- ======================= 躯干 ======================= -->
+  <!-- 骨盆 (MediaPipe 23/24) -->
+  <joint name="pelvis_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="pelvis_link"/>
+    <origin xyz="0 0 0.35" rpy="0 0 0"/>
+  </joint>
+
+  <link name="pelvis_link">
+    <inertial>
+      <origin xyz="0 0 0"/>
+      <mass value="2.5"/>
+      <inertia ixx="0.03" ixy="0" ixz="0" iyy="0.03" iyz="0" izz="0.02"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <box size="0.22 0.12 0.1"/>
+      </geometry>
+      <origin xyz="0 0 0"/>
+      <material name="brown">
+        <color rgba="0.6 0.4 0.3 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.22 0.12 0.1"/>
+      </geometry>
+      <origin xyz="0 0 0"/>
+    </collision>
+  </link>
+
+  <!-- 腹部 (MediaPipe 11/12) -->
+  <joint name="abdomen_joint" type="fixed">
+    <parent link="pelvis_link"/>
+    <child link="abdomen_link"/>
+    <origin xyz="0 0 0.15" rpy="0 0 0"/>
+  </joint>
+
+  <link name="abdomen_link">
+    <inertial>
+      <origin xyz="0 0 0.15"/>
+      <mass value="3.0"/>
+      <inertia ixx="0.04" ixy="0" ixz="0" iyy="0.04" iyz="0" izz="0.02"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <box size="0.2 0.1 0.3"/>
+      </geometry>
+      <origin xyz="0 0 0.15"/>
+      <material name="blue_torso">
+        <color rgba="0.3 0.6 0.9 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.2 0.1 0.3"/>
+      </geometry>
+      <origin xyz="0 0 0.15"/>
+    </collision>
+  </link>
+
+  <!-- 胸部/肩膀 (MediaPipe 11/12) -->
+  <joint name="chest_joint" type="fixed">
+    <parent link="abdomen_link"/>
+    <child link="chest_link"/>
+    <origin xyz="0 0 0.35" rpy="0 0 0"/>
+  </joint>
+
+  <link name="chest_link">
+    <inertial>
+      <origin xyz="0 0 0.1"/>
+      <mass value="4.0"/>
+      <inertia ixx="0.05" ixy="0" ixz="0" iyy="0.05" iyz="0" izz="0.03"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <box size="0.24 0.12 0.25"/>
+      </geometry>
+      <origin xyz="0 0 0.1"/>
+      <material name="red_chest">
+        <color rgba="0.8 0.3 0.3 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.24 0.12 0.25"/>
+      </geometry>
+      <origin xyz="0 0 0.1"/>
+    </collision>
+  </link>
+
+  <!-- ======================= 左臂 ======================= -->
+  <!-- 左肩关节 (MediaPipe 11) -->
+  <joint name="left_shoulder" type="revolute">
+    <parent link="chest_link"/>
+    <child link="left_shoulder_link"/>
+    <origin xyz="-0.15 0.1 0.2" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-3.14159" upper="3.14159" effort="200" velocity="4.0"/>
+  </joint>
+
+  <link name="left_shoulder_link">
+    <inertial>
+      <origin xyz="0 0.1 0"/>
+      <mass value="1.0"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <capsule length="0.25" radius="0.04"/>
+      </geometry>
+      <origin xyz="0 0.125 0" rpy="0 1.5707 0"/>
+      <material name="red_arm">
+        <color rgba="0.9 0.2 0.2 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <capsule length="0.25" radius="0.04"/>
+      </geometry>
+      <origin xyz="0 0.125 0" rpy="0 1.5707 0"/>
+    </collision>
+  </link>
+
+  <!-- 左肘关节 (MediaPipe 13) -->
+  <joint name="left_elbow" type="revolute">
+    <parent link="left_shoulder_link"/>
+    <child link="left_forearm_link"/>
+    <origin xyz="0 0.25 0" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="0" upper="3.14159" effort="200" velocity="4.0"/>
+  </joint>
+
+  <link name="left_forearm_link">
+    <inertial>
+      <origin xyz="0 0.1 0"/>
+      <mass value="0.8"/>
+      <inertia ixx="0.008" ixy="0" ixz="0" iyy="0.008" iyz="0" izz="0.008"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <capsule length="0.25" radius="0.035"/>
+      </geometry>
+      <origin xyz="0 0.125 0" rpy="0 1.5707 0"/>
+      <material name="orange_arm">
+        <color rgba="1.0 0.5 0.0 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <capsule length="0.25" radius="0.035"/>
+      </geometry>
+      <origin xyz="0 0.125 0" rpy="0 1.5707 0"/>
+    </collision>
+  </link>
+
+  <!-- 右臂 -->
+  <joint name="right_shoulder" type="revolute">
+    <parent link="chest_link"/>
+    <child link="right_shoulder_link"/>
+    <origin xyz="0.15 0.1 0.2" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-3.14159" upper="3.14159" effort="200" velocity="4.0"/>
+  </joint>
+
+  <link name="right_shoulder_link">
+    <inertial>
+      <origin xyz="0 0.1 0"/>
+      <mass value="1.0"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <capsule length="0.25" radius="0.04"/>
+      </geometry>
+      <origin xyz="0 0.125 0" rpy="0 1.5707 0"/>
+      <material name="red_arm">
+        <color rgba="0.9 0.2 0.2 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <capsule length="0.25" radius="0.04"/>
+      </geometry>
+      <origin xyz="0 0.125 0" rpy="0 1.5707 0"/>
+    </collision>
+  </link>
+
+  <joint name="right_elbow" type="revolute">
+    <parent link="right_shoulder_link"/>
+    <child link="right_forearm_link"/>
+    <origin xyz="0 0.25 0" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="0" upper="3.14159" effort="200" velocity="4.0"/>
+  </joint>
+
+  <link name="right_forearm_link">
+    <inertial>
+      <origin xyz="0 0.1 0"/>
+      <mass value="0.8"/>
+      <inertia ixx="0.008" ixy="0" ixz="0" iyy="0.008" iyz="0" izz="0.008"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <capsule length="0.25" radius="0.035"/>
+      </geometry>
+      <origin xyz="0 0.125 0" rpy="0 1.5707 0"/>
+      <material name="orange_arm">
+        <color rgba="1.0 0.5 0.0 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <capsule length="0.25" radius="0.035"/>
+      </geometry>
+      <origin xyz="0 0.125 0" rpy="0 1.5707 0"/>
+    </collision>
+  </link>
+
+  <!-- ======================= 头部 ======================= -->
+  <!-- 颈部 -->
+  <joint name="neck_joint" type="fixed">
+    <parent link="chest_link"/>
+    <child link="neck_link"/>
+    <origin xyz="0 0 0.25" rpy="0 0 0"/>
+  </joint>
+
+  <link name="neck_link">
+    <inertial>
+      <origin xyz="0 0 0.06"/>
+      <mass value="0.5"/>
+      <inertia ixx="0.002" ixy="0" ixz="0" iyy="0.002" iyz="0" izz="0.002"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <cylinder length="0.12" radius="0.03"/>
+      </geometry>
+      <origin xyz="0 0 0.06" rpy="0 0 0"/>
+      <material name="skin_tone">
+        <color rgba="0.95 0.80 0.69 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.12" radius="0.03"/>
+      </geometry>
+      <origin xyz="0 0 0.06" rpy="0 0 0"/>
+    </collision>
+  </link>
+
+  <!-- 头部 (MediaPipe 0) -->
+  <joint name="head_joint" type="fixed">
+    <parent link="neck_link"/>
+    <child link="head_link"/>
+    <origin xyz="0 0 0.15" rpy="0 0 0"/>
+  </joint>
+
+  <link name="head_link">
+    <inertial>
+      <origin xyz="0 0 0.1"/>
+      <mass value="1.5"/>
+      <inertia ixx="0.015" ixy="0" ixz="0" iyy="0.015" iyz="0" izz="0.015"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <sphere radius="0.1"/>
+      </geometry>
+      <origin xyz="0 0 0.1"/>
+      <material name="skin_head">
+        <color rgba="0.95 0.80 0.69 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <sphere radius="0.1"/>
+      </geometry>
+      <origin xyz="0 0 0.1"/>
+    </collision>
+  </link>
+
+</robot>

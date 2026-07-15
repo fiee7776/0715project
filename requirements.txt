@@ -1,0 +1,29 @@
+# 具身智能运动捕捉系统的项目依赖
+# Humanoid Dance Project - Requirements
+
+# 视觉处理
+opencv-python==4.8.1.78
+mediapipe==0.10.9
+
+# 数值计算与 GPU 加速
+torch==2.7.1
+torchvision==0.18.1
+numpy==1.24.3
+scipy==1.11.4
+
+# 数据处理
+pandas==2.1.3
+scikit-learn==1.3.2
+
+# 可视化
+matplotlib==3.8.2
+plotly==5.18.0
+
+# 机器人仿真 ✓ 已激活
+pybullet==3.1.11
+gym==0.26.2
+
+# 工具和测试
+pytest==7.4.3
+black==23.12.1
+flake8==6.1.0

@@ -1,0 +1,86 @@
+solid trapezoid_torso
+  facet normal 0 0 0
+    outer loop
+      vertex -0.10 -0.07 -0.23
+      vertex 0.10 -0.07 -0.23
+      vertex 0.15 -0.07 0.23
+    endloop
+  endfacet
+  facet normal 0 0 0
+    outer loop
+      vertex -0.10 -0.07 -0.23
+      vertex 0.15 -0.07 0.23
+      vertex -0.15 -0.07 0.23
+    endloop
+  endfacet
+  facet normal 0 0 0
+    outer loop
+      vertex -0.10 0.07 -0.23
+      vertex 0.15 0.07 0.23
+      vertex 0.10 0.07 -0.23
+    endloop
+  endfacet
+  facet normal 0 0 0
+    outer loop
+      vertex -0.10 0.07 -0.23
+      vertex -0.15 0.07 0.23
+      vertex 0.15 0.07 0.23
+    endloop
+  endfacet
+  facet normal 0 0 0
+    outer loop
+      vertex -0.10 -0.07 -0.23
+      vertex -0.10 0.07 -0.23
+      vertex 0.10 0.07 -0.23
+    endloop
+  endfacet
+  facet normal 0 0 0
+    outer loop
+      vertex -0.10 -0.07 -0.23
+      vertex 0.10 0.07 -0.23
+      vertex 0.10 -0.07 -0.23
+    endloop
+  endfacet
+  facet normal 0 0 0
+    outer loop
+      vertex -0.15 -0.07 0.23
+      vertex 0.15 -0.07 0.23
+      vertex 0.15 0.07 0.23
+    endloop
+  endfacet
+  facet normal 0 0 0
+    outer loop
+      vertex -0.15 -0.07 0.23
+      vertex 0.15 0.07 0.23
+      vertex -0.15 0.07 0.23
+    endloop
+  endfacet
+  facet normal 0 0 0
+    outer loop
+      vertex -0.10 -0.07 -0.23
+      vertex -0.15 -0.07 0.23
+      vertex -0.15 0.07 0.23
+    endloop
+  endfacet
+  facet normal 0 0 0
+    outer loop
+      vertex -0.10 -0.07 -0.23
+      vertex -0.15 0.07 0.23
+      vertex -0.10 0.07 -0.23
+    endloop
+  endfacet
+  facet normal 0 0 0
+    outer loop
+      vertex 0.10 -0.07 -0.23
+      vertex 0.10 0.07 -0.23
+      vertex 0.15 0.07 0.23
+    endloop
+  endfacet
+  facet normal 0 0 0
+    outer loop
+      vertex 0.10 -0.07 -0.23
+      vertex 0.15 0.07 0.23
+      vertex 0.15 -0.07 0.23
+    endloop
+  endfacet
+endsolid trapezoid_torso
