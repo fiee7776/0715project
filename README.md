@@ -1,148 +1,164 @@
-# G1 铁山靠 —— 基于强化学习的人形机器人戏曲武打动作复现
+# G1 铁山靠：基于强化学习的人形机器人动作复现
 
-> 从人体视频动作采集，到仿真训练，再到真机部署的完整 Sim2Real 链路实践。以宇树 G1 人形机器人复现中国戏曲经典亮相动作"铁山靠"。
-
----
-
-## 项目简介
-
-本项目基于 [unitree_rl_lab](https://github.com/unitreerobotics/unitree_rl_lab)（NVIDIA IsaacLab 强化学习框架）与宇树 G1-29dof 人形机器人，探索"人体动作 → 机器人动作"的完整技术链路：通过视频提取人体运动数据，重定向到机器人骨架，在仿真环境中用强化学习训练出可执行该动作的控制策略，先在仿真中验证（Sim2Sim），再评估向真机部署（Sim2Real）的可行性。
-
-本次复现目标动作为**"铁山靠"**——中国传统戏曲（京剧）中武将亮相的经典身段，动作幅度大、姿态张力强，对机器人全身协调控制和动态平衡能力是一次很好的检验。
-
-## 技术背景
-
-项目思路来自对 2025 年央视春晚人形机器人表演的技术拆解：机器人如何通过"动作捕捉 → 动作重定向 → 仿真强化学习 → 真机部署"这条链路学会人类的复杂动作。完整技术原理与背景介绍见 [`docs/项目介绍.pptx`](./docs/)。
+本项目面向宇树 G1-29dof 人形机器人，记录从单目视频动作提取、跨形态动作重定向、IsaacLab 强化学习训练，到 Sim2Sim 部署验证的完整流程。当前实验任务在代码中命名为 `Input5`，对应的训练环境 ID 为 `Unitree-G1-29dof-Mimic-Input5`。
 
 ## 技术链路
 
-```
-┌─────────────┐     ┌──────────────┐     ┌───────────────┐     ┌────────────────┐     ┌─────────────┐
-│  视频素材    │ --> │  人体动作提取 │ --> │  动作重定向     │ --> │  仿真强化学习    │ --> │  Sim2Sim /   │
-│ (铁山靠动作) │     │   (GVHMR)    │     │    (GMR)       │     │ (IsaacLab+AMP)  │     │  Sim2Real    │
-└─────────────┘     └──────────────┘     └───────────────┘     └────────────────┘     └─────────────┘
+```text
+视频素材
+  -> GVHMR 提取人体三维动作
+  -> GMR 重定向到 G1-29dof
+  -> IsaacLab + unitree_rl_lab 模仿学习与强化学习
+  -> 导出策略
+  -> Mujoco Sim2Sim 验证
+  -> Sim2Real（后续）
 ```
 
-| 阶段 | 工具/框架 | 说明 |
+| 阶段 | 工具或框架 | 说明 |
 |---|---|---|
-| 动作采集 | 自拍/网络视频素材 | 单人入镜、正面或斜前方拍摄、全身可见 |
-| 人体动作提取 | [GVHMR](https://github.com/zju3dv/GVHMR) | 单目视频 → 人体 3D 动作序列（SMPL 格式），基于视觉深度学习模型逐帧估计关节点与全身姿态 |
-| 动作重定向 | [GMR](https://github.com/YanjieZe/GMR)（General Motion Retargeting） | 将 SMPL 人体动作映射到 G1 机器人关节空间，基于逆运动学优化，兼顾末端姿态、关节位置/速度约束 |
-| 仿真训练 | [IsaacLab](https://github.com/isaac-sim/IsaacLab) + [unitree_rl_lab](https://github.com/unitreerobotics/unitree_rl_lab) | 基于 AMP（Adversarial Motion Priors）模仿学习，训练策略网络输出关节动作，使机器人在物理仿真中复现目标动作 |
-| Sim2Sim | [unitree_mujoco](https://github.com/unitreerobotics/unitree_mujoco) | 训练策略从 IsaacSim 迁移到 Mujoco 独立仿真器，验证策略是否过拟合于单一仿真器的物理特性 |
-| Sim2Real | Unitree SDK2 + C++ 控制程序 | 部署到 G1 实体机器人（视条件推进，为项目后续阶段） |
+| 人体动作提取 | [GVHMR](https://github.com/zju3dv/GVHMR) | 将单目视频转换为 SMPL 人体三维动作序列 |
+| 动作重定向 | [GMR](https://github.com/YanjieZe/GMR) | 将人体动作映射到 G1 关节空间 |
+| 仿真训练 | [IsaacLab](https://github.com/isaac-sim/IsaacLab) + [unitree_rl_lab](https://github.com/unitreerobotics/unitree_rl_lab) | 训练机器人跟踪目标动作并保持动态稳定 |
+| Sim2Sim | [unitree_mujoco](https://github.com/unitreerobotics/unitree_mujoco) | 在独立物理仿真器中验证策略迁移效果 |
+| Sim2Real | Unitree SDK2 | 后续部署到 G1 实体机器人 |
 
-## 仓库结构
+## 仓库内容
 
-```
+本仓库不重复保存完整的 GVHMR、GMR、IsaacLab 和 unitree_rl_lab 上游源码，只保存本项目新增或修改的代码、配置、动作数据和部署参数。
+
+```text
 .
-├── docs/                      # 项目介绍 PPT、技术说明文档
-├── motion_capture/             # 视频素材、GVHMR 提取结果
-│   ├── raw_video/              # 原始拍摄视频
-│   └── smpl_output/            # GVHMR 输出的人体动作序列
-├── retargeting/                 # GMR 重定向脚本与结果
-│   └── g1_tieshankao.csv/npz    # 重定向后的 G1 关节角度序列
-├── unitree_rl_lab/               # 训练框架（子模块或独立部署）
-├── deploy/                       # Sim2Sim / Sim2Real 部署代码（C++ 控制程序）
-├── outputs/                      # 训练日志、checkpoint、导出策略（policy.onnx）
-└── README.md
+├── configs/                         # Stage1、Stage2a、Stage2b 和微调配置
+├── deploy/
+│   └── configs/                     # 部署参数
+├── docs/
+│   └── images/                      # 项目展示图片
+├── motion_capture/
+│   └── gvhmr_overrides/             # GVHMR 环境适配文件
+├── outputs/
+│   └── README.md                    # 大模型和训练产物存放说明
+├── patches/                         # 训练流程补丁
+├── retargeting/
+│   ├── data/                        # G1 动作 CSV
+│   └── gmr_overrides/               # GMR 修改代码
+├── scripts/                         # 数据处理、检查和打包脚本
+└── training/
+    └── unitree_overrides/           # unitree_rl_lab 修改代码
 ```
 
-## 环境部署
+## 环境
 
-### 服务器配置
-
-本项目训练环境部署于 [算力自由（GPUFree.cn）](https://www.gpufree.cn/) 云 GPU 平台：
+项目训练环境：
 
 | 项目 | 配置 |
 |---|---|
-| 镜像 | 具身机器人 / IsaacSim 5.0 + IsaacLab 2.2.1 |
+| 云平台 | GPUFree |
+| 系统 | Ubuntu 22.04 |
 | GPU | RTX 4090 24GB |
 | CPU / 内存 | 14 核 / 50GB |
+| 仿真环境 | IsaacSim 5.0 + IsaacLab 2.2.1 |
 
-详细环境搭建与训练过程记录见 [`docs/部署与训练工作流程.md`](./docs/)。
-
-### 快速开始
+上游依赖：
 
 ```bash
-# 1. 克隆 unitree_rl_lab 并安装
 git clone https://github.com/unitreerobotics/unitree_rl_lab.git
-cd unitree_rl_lab && conda activate isaaclab && ./unitree_rl_lab.sh -i
-
-# 2. 下载机器人 USD 模型文件
-hf download unitreerobotics/unitree_model --repo-type dataset --local-dir ./unitree_model
-
-# 3. 配置模型路径（编辑 source/unitree_rl_lab/unitree_rl_lab/assets/robots/unitree.py）
-# UNITREE_MODEL_DIR = "<你的路径>/unitree_model"
-
-# 4. 查看可用任务
-./unitree_rl_lab.sh -l
+git clone https://github.com/YanjieZe/GMR.git
+git clone https://github.com/zju3dv/GVHMR.git
 ```
 
-## 动作数据准备（铁山靠）
+依赖版本与安装方式以各上游项目文档为准。机器人模型可从 Unitree 官方模型仓库获取。
 
-1. 拍摄铁山靠动作参考视频（单人、正面/斜45°、全身入镜、背景干净、贴身衣物、关键姿态可停顿）
-2. 用 GVHMR 提取人体 3D 动作序列
-3. 用 GMR 将动作重定向到 G1-29dof 骨架，导出为训练可用的关节角度序列
-4. 参考仓库内现有的 `Unitree-G1-29dof-Mimic-Dance-102` / `Mimic-Gangnanm-Style` 任务配置，新建"铁山靠"专属 Mimic 训练任务，接入重定向后的动作数据
+## 应用本仓库修改
+
+将 unitree_rl_lab 修改文件按原路径覆盖到上游仓库：
+
+```bash
+cp -a training/unitree_overrides/source/. /path/to/unitree_rl_lab/source/
+```
+
+将 GMR 修改文件按原路径覆盖到上游仓库：
+
+```bash
+cp -a retargeting/gmr_overrides/. /path/to/GMR/
+```
+
+`training/unitree_overrides/` 顶层还保留了部分关键文件的独立快照，便于比较不同训练阶段。
+
+## 动作数据
+
+`retargeting/data/input5_v2_50hz.csv` 是当前纳入版本控制的 G1 动作数据。训练用二进制数据、原始视频和完整 GVHMR 输出不进入普通 Git 历史。
+
+主要处理脚本位于 `scripts/`：
+
+- `make_input5_v2.py`：生成 Input5 处理版本。
+- `analyze_tensorboard_run.py`：分析训练过程。
+- `reset_checkpoint_noise.py`：调整检查点中的探索参数。
+- `build_input5_windows_bundle.py`：构建部署测试包。
+- `run_input5_mujoco.py`：运行 Mujoco 验证流程。
 
 ## 训练
 
-```bash
-tmux new -s train
-./unitree_rl_lab.sh -t --task Unitree-G1-29dof-Mimic-TieShanKao --num_envs 4096
-```
-
-训练过程使用 `tmux` 保持后台运行；checkpoint 定期自动保存，支持从最近存档续训（`--resume --load_run <时间戳> --checkpoint <model_xxx.pt>`）。
-
-## 推理与可视化
+基础训练任务：
 
 ```bash
-./unitree_rl_lab.sh -p --task Unitree-G1-29dof-Mimic-TieShanKao \
-    --load_run <运行时间戳> --checkpoint <model_xxx.pt>
+cd /path/to/unitree_rl_lab
+tmux new -s input5-train
+./unitree_rl_lab.sh -t --task Unitree-G1-29dof-Mimic-Input5 --num_envs 4096
 ```
 
-推理时会自动导出部署用的 `policy.onnx` / `policy.pt`，路径位于对应运行目录下的 `exported/`。
+低探索微调任务：
 
-## Sim2Sim 部署
-
-将导出的 `policy.onnx` 替换至：
-```
-deploy/robots/g1_29dof/config/policy/mimic/tieshankao/exported/policy.onnx
-```
-
-编译并运行控制程序：
 ```bash
-cd deploy/robots/g1_29dof
-mkdir build && cd build
-cmake .. && make
-./g1_ctrl --network lo   # 本地 Mujoco 仿真联调
+./unitree_rl_lab.sh -t \
+  --task Unitree-G1-29dof-Mimic-Input5-Finetune \
+  --resume \
+  --load_run <运行目录> \
+  --checkpoint <model_xxx.pt>
 ```
 
-配合 [unitree_mujoco](https://github.com/unitreerobotics/unitree_mujoco) 启动仿真场景，验证策略在独立仿真器中的表现。
+推理与可视化：
 
-## 项目进展
+```bash
+./unitree_rl_lab.sh -p \
+  --task Unitree-G1-29dof-Mimic-Input5 \
+  --load_run <运行目录> \
+  --checkpoint <model_xxx.pt>
+```
 
-- [x] 服务器环境搭建（GPUFree.cn + IsaacLab）
-- [x] unitree_rl_lab 安装与验证（Velocity 任务训练跑通）
-- [x] 训练结果 Sim2Sim 移交测试
-- [ ] 铁山靠动作视频拍摄
-- [ ] GVHMR 人体动作提取
-- [ ] GMR 动作重定向到 G1
-- [ ] 铁山靠 Mimic 任务训练
-- [ ] 训练结果 Sim2Sim 验证
-- [ ] Sim2Real 真机部署（视条件推进）
+Stage1、Stage2a、Stage2b 的关键配置快照保存在 `configs/`，用于记录训练策略的演进过程。
 
-## 致谢
+## 模型与训练产物
 
-本项目基于以下开源项目构建：
+以下文件不直接提交到普通 Git 历史：
 
-- [IsaacLab](https://github.com/isaac-sim/IsaacLab)：仿真与训练基础框架
-- [unitree_rl_lab](https://github.com/unitreerobotics/unitree_rl_lab)：宇树机器人强化学习训练与部署框架
-- [unitree_mujoco](https://github.com/unitreerobotics/unitree_mujoco)：Sim2Sim 仿真验证
-- [GVHMR](https://github.com/zju3dv/GVHMR)：单目视频人体动作提取
-- [GMR](https://github.com/YanjieZe/GMR)：跨形态动作重定向
+- PyTorch 模型和检查点：`.pt`、`.pth`、`.ckpt`
+- 导出策略：`.onnx`
+- 二进制动作数据：`.npz`、`.pkl`
+- 原始视频、完整日志、TensorBoard 数据和压缩包
+- Conda 环境、依赖缓存和临时文件
 
-## License
+最终策略、检查点和演示视频应通过 GitHub Releases 或外部存储发布，仓库中保留下载说明和校验值。
 
-本项目遵循 [Apache-2.0 License](./LICENSE)，与上游 `unitree_rl_lab` 保持一致。
+## 当前进展
+
+- [x] GPUFree + IsaacLab 环境搭建
+- [x] unitree_rl_lab 安装与基础任务验证
+- [x] GVHMR 动作提取流程验证
+- [x] GMR 到 G1-29dof 动作重定向
+- [x] Input5 50Hz 动作 CSV 生成
+- [x] Input5 Mimic 任务注册
+- [x] Stage1、Stage2a、Stage2b 配置整理
+- [x] 低探索微调配置
+- [x] Mujoco 运行脚本与部署参数整理
+- [ ] 完整 Sim2Sim 结果验收
+- [ ] Sim2Real 真机部署
+
+## 上游项目
+
+- [IsaacLab](https://github.com/isaac-sim/IsaacLab)
+- [unitree_rl_lab](https://github.com/unitreerobotics/unitree_rl_lab)
+- [unitree_mujoco](https://github.com/unitreerobotics/unitree_mujoco)
+- [GVHMR](https://github.com/zju3dv/GVHMR)
+- [GMR](https://github.com/YanjieZe/GMR)
+
+使用本仓库中的上游适配代码时，请同时遵守对应上游项目的许可证。项目自有内容的统一许可证以仓库后续补充的 `LICENSE` 文件为准。
