@@ -1,0 +1,99 @@
+--- tracking_env_cfg.stage1.py
++++ tracking_env_cfg.stage2a.py
+@@ -149,7 +149,7 @@
+         last_action = ObsTerm(func=mdp.last_action)
+ 
+         def __post_init__(self):
+-            self.enable_corruption = False
++            self.enable_corruption = True
+             self.concatenate_terms = True
+ 
+     @configclass
+@@ -174,18 +174,79 @@
+ class EventCfg:
+     """Configuration for events."""
+ 
+     # startup
+-    # Stage 1: disable friction randomization so the policy first learns the video motion.
+-    physics_material = None
+-
+-    add_joint_default_pos = None
+-
+-    # Stage 1: disable torso COM randomization; re-enable after tracking is stable.
+-    base_com = None
++    physics_material = EventTerm(
++        func=mdp.randomize_rigid_body_material,
++        mode="startup",
++        params={
++            "asset_cfg": SceneEntityCfg("robot", body_names=".*"),
++            "static_friction_range": (0.7, 1.3),
++            "dynamic_friction_range": (0.6, 1.1),
++            "restitution_range": (0.0, 0.1),
++            "num_buckets": 64,
++        },
++    )
++
++    add_joint_default_pos = EventTerm(
++        func=mdp.randomize_joint_default_pos,
++        mode="startup",
++        params={
++            "asset_cfg": SceneEntityCfg("robot", joint_names=[".*"]),
++            "pos_distribution_params": (-0.02, 0.02),
++            "operation": "add",
++        },
++    )
++
++    base_com = EventTerm(
++        func=mdp.randomize_rigid_body_com,
++        mode="startup",
++        params={
++            "asset_cfg": SceneEntityCfg("robot", body_names="torso_link"),
++            "com_range": {"x": (-0.01, 0.01), "y": (-0.01, 0.01), "z": (-0.015, 0.015)},
++        },
++    )
++
++    body_mass = EventTerm(
++        func=mdp.randomize_rigid_body_mass,
++        mode="startup",
++        params={
++            "asset_cfg": SceneEntityCfg("robot", body_names=".*"),
++            "mass_distribution_params": (0.95, 1.05),
++            "operation": "scale",
++            "distribution": "uniform",
++            "recompute_inertia": True,
++        },
++    )
++
++    actuator_gains = EventTerm(
++        func=mdp.randomize_actuator_gains,
++        mode="startup",
++        params={
++            "asset_cfg": SceneEntityCfg("robot", joint_names=[".*"]),
++            "stiffness_distribution_params": (0.9, 1.1),
++            "damping_distribution_params": (0.9, 1.1),
++            "operation": "scale",
++            "distribution": "uniform",
++        },
++    )
+ 
+     # interval
+-    # Stage 1: disable random pushes; re-enable for sim-to-real robustness later.
+-    push_robot = None
++    push_robot = EventTerm(
++        func=mdp.push_by_setting_velocity,
++        mode="interval",
++        interval_range_s=(5.0, 8.0),
++        params={
++            "velocity_range": {
++                "x": (-0.2, 0.2),
++                "y": (-0.2, 0.2),
++                "z": (0.0, 0.0),
++                "roll": (0.0, 0.0),
++                "pitch": (0.0, 0.0),
++                "yaw": (-0.15, 0.15),
++            }
++        },
++    )
+ 
+ 
+ @configclass
